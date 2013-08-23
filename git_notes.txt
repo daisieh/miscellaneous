@@ -1,0 +1,29 @@
+You've forked a repo, made changes, and now want to make a clean version for a pull request.
+
+To make a new branch corresponding to the forked repo:
+
+> git branch <new-branch-name> <SHA of the original forked repo>
+
+Change to that branch.
+
+Copy over the changes you want to add to the pull request. Commit those changes to this branch.
+
+Make a new branch from this current branch and tag it just for this pull request.
+
+Then make the pull request, using the tagged branch.
+
+---------------------
+
+There are new changes on the original repo you forked.
+
+To merge new changes back from the forked repo:
+
+Change your working branch to the one that has the original forked repo (as discussed before).
+
+Add a remote to your git:
+> git remote add <remote_name> <remote URL from github>
+
+Then merge the remote changes to the working branch.
+> git pull <remote_name> master (presumably you are pulling from the remote's master branch)
+
+Then you can merge this branch into whatever working branch you like.
