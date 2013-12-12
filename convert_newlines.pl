@@ -19,9 +19,6 @@ sub wanted {
 	my $origfile = $File::Find::name;
 	my $dir = $File::Find::dir;
 	$dir = abs2rel($dir, $currdir);
-	my $newdir = "newdir/$dir";
-	$newdir =~ s/\/\.$//;
-	my $newfile = "$newdir/".basename($origfile);
 	my $thispath = getcwd;
 	if (-T $origfile) {
 		my $wholefile = read_file($origfile);
