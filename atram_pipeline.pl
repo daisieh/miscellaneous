@@ -69,7 +69,8 @@ foreach my $region (keys $regions) {
 	}
 }
 
-my ($mastertaxa, $regiontable) = meld_sequence_files (@regionfiles);
+my ($mastertaxa, $regiontable) = meld_sequence_files (\@regionfiles);
+delete $mastertaxa->{length};
 
 open FH, ">", "result.fasta";
 foreach my $s (keys $mastertaxa) {
