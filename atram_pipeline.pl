@@ -1,6 +1,7 @@
 #!usr/bin/perl
 
 use strict;
+require "subfuncs.pl";
 
 my $samplefile = shift @ARGV;
 my $regionfile = shift @ARGV;
@@ -28,7 +29,9 @@ foreach my $line (<FH>) {
 }
 close FH;
 
+my @regionfiles = ();
 foreach my $region (keys $regions) {
+	push @regionfiles, "$region.fasta";
 	open FH, ">", "$region.fasta";
 	truncate FH, 0;
 	close FH;
@@ -56,7 +59,7 @@ foreach my $region (keys $regions) {
 		print "$region $sample $contig\n";
 		if ($contig ne "") {
 			# pick this contig from the fasta file
-			my ($taxa, $taxanames) = parsefasta ("$region.exons.fasta");
+			my ($taxa, $taxanames) = parse_fasta ("$region.exons.fasta");
 			# write this contig out to the region.fasta file, named by sample.
 			open FH, ">>", "$region.fasta";
 			print "adding $contig to $region.fasta\n";
@@ -66,26 +69,10 @@ foreach my $region (keys $regions) {
 	}
 }
 
-sub parsefasta {
-	my $fastafile = shift;
+my ($mastertaxa, $regiontable) = meld_matrices (@regionfiles);
 
-	my $taxa = {};
-	my @taxanames = ();
-	open fileIN, "<", "$fastafile";
-	my $input = readline fileIN;
-	my $taxonlabel = "";
-	my $sequence = "";
-	while ($input !~ /^\s*$/) {
-		if ($input =~ /^>(.+)\s*$/) {
-			$taxonlabel = $1;
-			push @taxanames, $taxonlabel;
-		} else {
-			$input =~ /^\s*(.+)\s*$/;
-			$taxa->{$taxonlabel} .= $1;
-		}
-		$input = readline fileIN;
-	}
-
-	close (fileIN);
-	return $taxa, \@taxanames;
+open FH, ">", "result.fasta";
+foreach my $sample (keys $samples) {
+	print FH ">$sample\n$mastertaxa->{$region.fasta}\n";
 }
+close FH;
