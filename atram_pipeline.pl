@@ -33,9 +33,9 @@ foreach my $region (keys $regions) {
 	foreach my $sample (keys $samples) {
 		my $outname = "$region.$sample";
 		print "$outname\n";
-		system ("~/TRAM/sTRAM.pl -reads $samples->{$sample} -target $regions->{$region} -iter 10 -ins_length 400 -frac 0.2 -assemble Velvet -out $outname");
+		system ("perl ~/TRAM/sTRAM.pl -reads $samples->{$sample} -target $regions->{$region} -iter 10 -ins_length 400 -frac 0.2 -assemble Velvet -out $outname");
 		# run percentcoverage to get the contigs nicely aligned
-		system ("~/TRAM/test/PercentCoverage.pl $regions->{$region} $outname.all.fasta $region");
+		system ("perl ~/TRAM/test/PercentCoverage.pl $regions->{$region} $outname.all.fasta $region");
 
 		# find the one best contig (one with fewest gaps)
 		open FH, "<", "$region.Table.txt";
