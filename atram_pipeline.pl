@@ -9,7 +9,7 @@ if ($regions eq "") {
 	print "Usage: pipeline.pl samples regions\n";
 	exit;
 }
-
+print "opening $samples\n";
 my $samples = {};
 open FH, "<", $samples;
 foreach my $line (<FH>) {
@@ -18,6 +18,8 @@ foreach my $line (<FH>) {
 	}
 }
 close FH;
+
+print "opening $regions\n";
 
 my $regions = {};
 open FH, "<", $regions;
@@ -32,6 +34,7 @@ foreach my $region (keys $regions) {
 	# for each sample:
 	foreach my $sample (keys $samples) {
 		my $outname = "$region.$sample";
+		print "$outname\n";
 		system ("~/TRAM/sTRAM.pl -reads $samples->{$sample} -target $regions->{$region} -iter 10 -ins_length 400 -frac 0.2 -assemble Velvet -out $outname");
 		# run percentcoverage to get the contigs nicely aligned
 		system ("~/TRAM/test/PercentCoverage.pl $regions->{$region} $outname.all.fasta $region");
