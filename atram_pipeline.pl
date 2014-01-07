@@ -11,7 +11,7 @@ if ($regions eq "") {
 }
 print "opening $samples\n";
 my $samples = {};
-open FH, "<", $samples;
+open FH, "<", $samples or die "boo";
 foreach my $line (<FH>) {
 	print "$line\n";
 	if ($line =~ /(.+?)\t(.+)/) {
