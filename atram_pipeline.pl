@@ -13,6 +13,7 @@ print "opening $samples\n";
 my $samples = {};
 open FH, "<", $samples;
 foreach my $line (<FH>) {
+	print "$line\n";
 	if ($line =~ /(.+?)\t(.+)/) {
 		$samples->{$1} = $2;
 	}
