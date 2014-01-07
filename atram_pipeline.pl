@@ -52,7 +52,7 @@ foreach my $region (keys $regions) {
 		print "$region $sample $contig\n";
 		if ($contig ne "") {
 			# pick this contig from the fasta file
-			my ($taxa, $taxanames) = parsefasta ("$outname.all.fasta");
+			my ($taxa, $taxanames) = parsefasta ("$region.exons.fasta");
 			# write this contig out to the region.fasta file, named by sample.
 			open FH, ">>", "$region.fasta";
 			print "adding $contig to $region.fasta\n";
