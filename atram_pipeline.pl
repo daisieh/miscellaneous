@@ -29,6 +29,10 @@ foreach my $line (<FH>) {
 close FH;
 
 foreach my $region (keys $regions) {
+	open FH, ">", "$region.fasta";
+	truncate FH, 0;
+	close FH;
+
 	# for each sample:
 	foreach my $sample (keys $samples) {
 		my $outname = "$region.$sample";
