@@ -55,6 +55,7 @@ foreach my $region (keys $regions) {
 			my ($taxa, $taxanames) = parsefasta ("$outname.all.fasta");
 			# write this contig out to the region.fasta file, named by sample.
 			open FH, ">>", "$region.fasta";
+			print "adding $contig to $region.fasta\n";
 			print FH ">$sample\n$taxa->{$contig}\n";
 			close FH;
 		}
