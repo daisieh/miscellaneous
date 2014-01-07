@@ -2,30 +2,25 @@
 
 use strict;
 
-my $samples = shift @ARGV;
-my $regions = shift @ARGV;
+my $samplefile = shift @ARGV;
+my $regionfile = shift @ARGV;
 
-if ($regions eq "") {
+if ($regionfile eq "") {
 	print "Usage: pipeline.pl samples regions\n";
 	exit;
 }
-$samples = "tram_samples.txt";
-print "opening $samples\n";
+$samplefile = "tram_samples.txt";
 my $samples = {};
-open FH, "<", "$samples" or die "boo $samples";
+open FH, "<", "$samplefile" or die "boo $samplefile";
 foreach my $line (<FH>) {
-	print "$line\n";
 	if ($line =~ /(.+?)\t(.+)/) {
-	print "hello\n";
 		$samples->{$1} = $2;
 	}
 }
 close FH;
 
-print "opening $regions\n";
-
 my $regions = {};
-open FH, "<", $regions;
+open FH, "<", $regionfile;
 foreach my $line (<FH>) {
 	if ($line =~ /(.+?)\t(.+)/) {
 		$regions->{$1} = $2;
