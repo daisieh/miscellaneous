@@ -9,9 +9,10 @@ if ($regions eq "") {
 	print "Usage: pipeline.pl samples regions\n";
 	exit;
 }
+$samples = "tram_samples.txt";
 print "opening $samples\n";
 my $samples = {};
-open FH, "<", "$samples" or die "boo";
+open FH, "<", "$samples" or die "boo $samples";
 foreach my $line (<FH>) {
 	print "$line\n";
 	if ($line =~ /(.+?)\t(.+)/) {
