@@ -72,7 +72,7 @@ foreach my $region (keys $regions) {
 my ($mastertaxa, $regiontable) = meld_matrices (@regionfiles);
 
 open FH, ">", "result.fasta";
-foreach my $sample (keys $samples) {
-	print FH ">$sample\n$mastertaxa->{$region.fasta}\n";
+foreach my $s (keys $mastertaxa) {
+	print FH ">$s\n$mastertaxa->{$s}\n";
 }
 close FH;
