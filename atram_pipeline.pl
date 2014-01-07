@@ -69,7 +69,7 @@ foreach my $region (keys $regions) {
 	}
 }
 
-my ($mastertaxa, $regiontable) = meld_matrices (@regionfiles);
+my ($mastertaxa, $regiontable) = meld_sequence_files (@regionfiles);
 
 open FH, ">", "result.fasta";
 foreach my $s (keys $mastertaxa) {
