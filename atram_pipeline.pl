@@ -21,16 +21,19 @@ foreach my $line (<FH>) {
 close FH;
 
 my $regions = {};
+my @regionnames = ();
 open FH, "<", $regionfile;
 foreach my $line (<FH>) {
 	if ($line =~ /(.+?)\t(.+)/) {
 		$regions->{$1} = $2;
+		push @regionnames, $1;
 	}
 }
 close FH;
 
+open LOG_FH, ">", "result_log.txt";
 my @regionfiles = ();
-foreach my $region (keys $regions) {
+foreach my $region (@regionnames) {
 	push @regionfiles, "$region.fasta";
 	open FH, ">", "$region.fasta";
 	truncate FH, 0;
@@ -41,6 +44,7 @@ foreach my $region (keys $regions) {
 		my $outname = "$region.$sample";
 		print "$outname\n";
 		system_call ("perl ~/TRAM/sTRAM.pl -reads $samples->{$sample} -target $regions->{$region} -iter 10 -ins_length 400 -frac 0.2 -assemble Velvet -out $outname");
+		system_call ("rm $outname.*.blast.fasta");
 		# run percentcoverage to get the contigs nicely aligned
 		system_call ("perl ~/TRAM/test/PercentCoverage.pl $regions->{$region} $outname.all.fasta $region");
 
@@ -52,11 +56,12 @@ foreach my $region (keys $regions) {
 			if ($line =~ /(.+?)\t(\d+?)\t(.+)/) {
 				if ($3 > $percent) {
 					$contig = $1;
+					$percent = $3;
 				}
 			}
 		}
 		close FH;
-		print "$region $sample $contig\n";
+		print LOG_FH "$region\t$sample\t$contig\t$percent\n";
 		if ($contig ne "") {
 			# pick this contig from the fasta file
 			my ($taxa, $taxanames) = parse_fasta ("$region.exons.fasta");
@@ -68,6 +73,8 @@ foreach my $region (keys $regions) {
 		}
 	}
 }
+
+close LOG_FH;
 
 my ($mastertaxa, $regiontable) = meld_sequence_files (\@regionfiles);
 delete $mastertaxa->{length};
