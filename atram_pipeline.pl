@@ -10,12 +10,13 @@ if ($regionfile eq "") {
 	print "Usage: pipeline.pl samples regions\n";
 	exit;
 }
-$samplefile = "tram_samples.txt";
 my $samples = {};
-open FH, "<", "$samplefile" or die "boo $samplefile";
+my @samplenames = ();
+open FH, "<", "$samplefile" or die "couldn't open $samplefile";
 foreach my $line (<FH>) {
 	if ($line =~ /(.+?)\t(.+)/) {
 		$samples->{$1} = $2;
+		push @samplenames, $1;
 	}
 }
 close FH;
@@ -40,29 +41,34 @@ foreach my $region (@regionnames) {
 	close FH;
 
 	# for each sample:
-	foreach my $sample (keys $samples) {
+	foreach my $sample (@samplenames) {
 		my $outname = "$region.$sample";
 		print "$outname\n";
-# 		system_call ("perl ~/TRAM/sTRAM.pl -reads $samples->{$sample} -target $regions->{$region} -iter 10 -ins_length 400 -frac 0.2 -assemble Velvet -out $outname");
-# 		system_call ("rm $outname.*.blast.fasta");
+		system_call ("perl ~/TRAM/aTRAM.pl -reads $samples->{$sample} -target $regions->{$region} -iter 10 -ins_length 400 -frac 0.01 -assemble Velvet -out $outname");
+		system_call ("rm $outname.*.blast.fasta");
+		system_call ("rm -r $outname.Velvet");
 		# run percentcoverage to get the contigs nicely aligned
-		system_call ("perl ~/TRAM/test/PercentCoverage.pl $regions->{$region} $outname.best.fasta $region");
+		system_call ("perl ~/Documents/Work/Sandbox/github/juliema_TRAM/test/PercentCoverage.pl $regions->{$region} $outname.best.fasta $region");
 
 		# find the one best contig (one with fewest gaps)
-		open FH, "<", "$region.Table.txt";
+		system_call ("blastn -task blastn -query $region.exons.fasta -subject $regions->{$region} -outfmt '6 qseqid bitscore' -out $region.$outname.blast");
+		open FH, "<", "$region.$outname.blast";
 		my $contig = "";
-		my $percent = 0;
+		my $score = 0;
 		foreach my $line (<FH>) {
-			if ($line =~ /(.+?)\t(\d+?)\t(.+)/) {
-				if ($3 > $percent) {
+			if ($line =~ /(\S+)\s+(\S+)$/) {
+				if ($1 =~ /$region/) {
+					next;
+				}
+				if ($2 > $score) {
 					$contig = $1;
-					$percent = $3;
+					$score = $2;
 				}
 			}
 		}
 		close FH;
-		$percent =~ s/^(\d+\.\d{2}).*$/\1/;
-		print LOG_FH "$region\t$sample\t$contig\t$percent\n";
+		$score =~ s/^(\d+\.\d{2}).*$/\1/;
+		print LOG_FH "$region\t$sample\t$contig\t$score\n";
 		if ($contig ne "") {
 			# pick this contig from the fasta file
 			my ($taxa, $taxanames) = parse_fasta ("$region.exons.fasta");
@@ -77,11 +83,3 @@ foreach my $region (@regionnames) {
 
 close LOG_FH;
 
-# my ($mastertaxa, $regiontable) = meld_sequence_files (\@regionfiles);
-# delete $mastertaxa->{length};
-#
-# open FH, ">", "result.fasta";
-# foreach my $s (keys $mastertaxa) {
-# 	print FH ">$s\n$mastertaxa->{$s}\n";
-# }
-# close FH;
