@@ -48,7 +48,7 @@ foreach my $region (@regionnames) {
 		#system_call ("rm $outname.*.blast.fasta");
 		#system_call ("rm -r $outname.Velvet");
 		# run percentcoverage to get the contigs nicely aligned
-		#system_call ("perl ~/TRAM/test/PercentCoverage.pl $regions->{$region} $outname.best.fasta $region");
+		system_call ("perl ~/TRAM/test/PercentCoverage.pl $regions->{$region} $outname.best.fasta $region");
 
 		# find the one best contig (one with fewest gaps)
 		system_call ("blastn -task blastn -query $region.exons.fasta -subject $regions->{$region} -outfmt '6 qseqid bitscore' -out $region.$outname.blast");
@@ -80,7 +80,7 @@ foreach my $region (@regionnames) {
 			($taxa, $taxanames) = parse_fasta ("$outname.best.fasta");
 			# write this contig out to the region.fasta file, named by sample.
 			open FH, ">>", "$region.full.fasta";
-			print "adding $contig to $region.full.fasta\n";
+			print "adding $contig from $outname.best.fasta to $region.full.fasta\n";
 			print FH ">$sample\n$taxa->{$contig}\n";
 			close FH;
 		}
