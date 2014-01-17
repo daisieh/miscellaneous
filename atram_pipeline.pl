@@ -77,7 +77,7 @@ foreach my $region (@regionnames) {
 			print "adding $contig to $region.exons.fasta\n";
 			print FH ">$sample\n$taxa->{$contig}\n";
 			close FH;
-			($taxa, $taxanames) = parse_fasta ("$outname.fasta");
+			($taxa, $taxanames) = parse_fasta ("$outname.best.fasta");
 			# write this contig out to the region.fasta file, named by sample.
 			open FH, ">>", "$region.full.fasta";
 			print "adding $contig to $region.full.fasta\n";
