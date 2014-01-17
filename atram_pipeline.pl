@@ -44,11 +44,11 @@ foreach my $region (@regionnames) {
 	foreach my $sample (@samplenames) {
 		my $outname = "$region.$sample";
 		print "$outname\n";
-		system_call ("perl ~/TRAM/sTRAM.pl -reads $samples->{$sample} -target $regions->{$region} -iter 10 -ins_length 400 -frac 0.01 -assemble Velvet -out $outname");
-		system_call ("rm $outname.*.blast.fasta");
-		system_call ("rm -r $outname.Velvet");
+		#system_call ("perl ~/TRAM/sTRAM.pl -reads $samples->{$sample} -target $regions->{$region} -iter 10 -ins_length 400 -frac 0.01 -assemble Velvet -out $outname");
+		#system_call ("rm $outname.*.blast.fasta");
+		#system_call ("rm -r $outname.Velvet");
 		# run percentcoverage to get the contigs nicely aligned
-		system_call ("perl ~/TRAM/test/PercentCoverage.pl $regions->{$region} $outname.best.fasta $region");
+		#system_call ("perl ~/TRAM/test/PercentCoverage.pl $regions->{$region} $outname.best.fasta $region");
 
 		# find the one best contig (one with fewest gaps)
 		system_call ("blastn -task blastn -query $region.exons.fasta -subject $regions->{$region} -outfmt '6 qseqid bitscore' -out $region.$outname.blast");
