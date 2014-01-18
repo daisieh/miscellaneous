@@ -1,26 +1,39 @@
 #!usr/bin/perl
 
 use strict;
+use Getopt::Long;
+use Pod::Usage;
 require "subfuncs.pl";
 
-my $samplefile = shift @ARGV;
-my $regionfile = shift @ARGV;
-my $kmer = shift @ARGV;
-my $iter = shift @ARGV;
+if (@ARGV == 0) {
+    pod2usage(-verbose => 1);
+}
 
-if ($regionfile eq "") {
+my $help = 0;
+my $samplefile = "";
+my $regionfile = "";
+my $kmer = 31;
+my $iter = 10;
+my $frac = 0.01;
+
+GetOptions ('samples=s' => \$samplefile,
+            'regions=s' => \$regionfile,
+            'kmer=i' => \$kmer,
+            'iter=i' => \$iter,
+			'frac=f' => \$frac,
+            'help|?' => \$help) or pod2usage(-msg => "GetOptions failed.", -exitval => 2);
+
+if ($help) {
+    pod2usage(-verbose => 1);
+}
+
+
+
+if (($regionfile eq "") || ($samplefile eq "")) {
 	print "Usage: pipeline.pl samples regions\n";
 	exit;
 }
 
-if ($kmer == 0) {
-	print "no kmer\n";
-	$kmer = 31;
-}
-if ($iter == 0) {
-	print "no iter\n";
-	$iter = 10;
-}
 my $samples = {};
 my @samplenames = ();
 open FH, "<", "$samplefile" or die "couldn't open $samplefile";
@@ -55,7 +68,7 @@ foreach my $region (@regionnames) {
 	foreach my $sample (@samplenames) {
 		my $outname = "$region.$sample";
 		print "$outname\n";
-		system_call ("perl ~/TRAM/sTRAM.pl -reads $samples->{$sample} -target $regions->{$region} -iter $iter -ins_length 400 -frac 0.01 -assemble Velvet -out $outname -kmer $kmer -complete");
+		system_call ("perl ~/TRAM/sTRAM.pl -reads $samples->{$sample} -target $regions->{$region} -iter $iter -ins_length 400 -frac $frac -assemble Velvet -out $outname -kmer $kmer -complete");
 		system_call ("rm $outname.*.blast.fasta");
 		system_call ("rm -r $outname.Velvet");
 		# run percentcoverage to get the contigs nicely aligned
