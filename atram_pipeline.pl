@@ -55,7 +55,7 @@ foreach my $region (@regionnames) {
 	foreach my $sample (@samplenames) {
 		my $outname = "$region.$sample";
 		print "$outname\n";
-		system_call ("perl ~/TRAM/sTRAM.pl -reads $samples->{$sample} -target $regions->{$region} -iter $iter -ins_length 400 -frac 0.01 -assemble Velvet -out $outname -kmer $kmer");
+		system_call ("perl ~/TRAM/sTRAM.pl -reads $samples->{$sample} -target $regions->{$region} -iter $iter -ins_length 400 -frac 0.01 -assemble Velvet -out $outname -kmer $kmer -complete");
 		system_call ("rm $outname.*.blast.fasta");
 		system_call ("rm -r $outname.Velvet");
 		# run percentcoverage to get the contigs nicely aligned
