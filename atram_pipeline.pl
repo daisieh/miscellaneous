@@ -5,10 +5,16 @@ require "subfuncs.pl";
 
 my $samplefile = shift @ARGV;
 my $regionfile = shift @ARGV;
+my $kmer = shift @ARGV;
 
 if ($regionfile eq "") {
 	print "Usage: pipeline.pl samples regions\n";
 	exit;
+}
+
+if ($kmer == 0) {
+	print "no kmer\n";
+	$kmer = 31;
 }
 my $samples = {};
 my @samplenames = ();
@@ -44,9 +50,9 @@ foreach my $region (@regionnames) {
 	foreach my $sample (@samplenames) {
 		my $outname = "$region.$sample";
 		print "$outname\n";
-		#system_call ("perl ~/TRAM/sTRAM.pl -reads $samples->{$sample} -target $regions->{$region} -iter 10 -ins_length 400 -frac 0.01 -assemble Velvet -out $outname");
-		#system_call ("rm $outname.*.blast.fasta");
-		#system_call ("rm -r $outname.Velvet");
+		system_call ("perl ~/TRAM/sTRAM.pl -reads $samples->{$sample} -target $regions->{$region} -iter 10 -ins_length 400 -frac 0.01 -assemble Velvet -out $outname -kmer $kmer");
+		system_call ("rm $outname.*.blast.fasta");
+		system_call ("rm -r $outname.Velvet");
 		# run percentcoverage to get the contigs nicely aligned
 		system_call ("perl ~/TRAM/test/PercentCoverage.pl $regions->{$region} $outname.best.fasta $region");
 
@@ -67,6 +73,7 @@ foreach my $region (@regionnames) {
 			}
 		}
 		close FH;
+		system_call ("rm $region.$outname.blast");
 		$score =~ s/^(\d+\.\d{2}).*$/\1/;
 		print LOG_FH "$region\t$sample\t$contig\t$score\n";
 		if ($contig ne "") {
