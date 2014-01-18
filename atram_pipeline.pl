@@ -6,6 +6,7 @@ require "subfuncs.pl";
 my $samplefile = shift @ARGV;
 my $regionfile = shift @ARGV;
 my $kmer = shift @ARGV;
+my $iter = shift @ARGV;
 
 if ($regionfile eq "") {
 	print "Usage: pipeline.pl samples regions\n";
@@ -15,6 +16,10 @@ if ($regionfile eq "") {
 if ($kmer == 0) {
 	print "no kmer\n";
 	$kmer = 31;
+}
+if ($iter == 0) {
+	print "no iter\n";
+	$iter = 10;
 }
 my $samples = {};
 my @samplenames = ();
@@ -50,7 +55,7 @@ foreach my $region (@regionnames) {
 	foreach my $sample (@samplenames) {
 		my $outname = "$region.$sample";
 		print "$outname\n";
-		system_call ("perl ~/TRAM/sTRAM.pl -reads $samples->{$sample} -target $regions->{$region} -iter 10 -ins_length 400 -frac 0.01 -assemble Velvet -out $outname -kmer $kmer");
+		system_call ("perl ~/TRAM/sTRAM.pl -reads $samples->{$sample} -target $regions->{$region} -iter $iter -ins_length 400 -frac 0.01 -assemble Velvet -out $outname -kmer $kmer");
 		system_call ("rm $outname.*.blast.fasta");
 		system_call ("rm -r $outname.Velvet");
 		# run percentcoverage to get the contigs nicely aligned
