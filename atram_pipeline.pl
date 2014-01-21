@@ -12,6 +12,7 @@ if (@ARGV == 0) {
 my $help = 0;
 my $samplefile = "";
 my $regionfile = "";
+my $outfile = "";
 my $kmer = 31;
 my $iter = 10;
 my $frac = 0.01;
@@ -21,12 +22,16 @@ GetOptions ('samples=s' => \$samplefile,
             'kmer=i' => \$kmer,
             'iter=i' => \$iter,
 			'frac=f' => \$frac,
+			'output|outfile=s' => \$outfile,
             'help|?' => \$help) or pod2usage(-msg => "GetOptions failed.", -exitval => 2);
 
 if ($help) {
     pod2usage(-verbose => 1);
 }
 
+if ($outfile eq "") {
+	$outfile = "result";
+}
 
 
 if (($regionfile eq "") || ($samplefile eq "")) {
@@ -56,20 +61,20 @@ foreach my $line (<FH>) {
 }
 close FH;
 
-open LOG_FH, ">", "result_log.txt";
-	print LOG_FH "region\tsample\tcontig\tbitscore\tpercentcoverage\n";
+open LOG_FH, ">", "$outfile.log";
+print LOG_FH "region\tsample\tcontig\tbitscore\tpercentcoverage\n";
 foreach my $region (@regionnames) {
-	open FH, ">", "$region.exons.fasta";
+	open FH, ">", "$outfile.$region.exons.fasta";
 	truncate FH, 0;
 	close FH;
-	open FH, ">", "$region.full.fasta";
+	open FH, ">", "$outfile.$region.full.fasta";
 	truncate FH, 0;
 	close FH;
 
 	# for each sample:
 	foreach my $sample (@samplenames) {
-		my $outname = "$region.$sample";
-		print "$outname\n";
+		my $outname = "$outfile.$region.$sample";
+		print "$region $sample\n";
 		system_call ("perl ~/TRAM/sTRAM.pl -reads $samples->{$sample} -target $regions->{$region} -iter $iter -ins_length 400 -frac $frac -assemble Velvet -out $outname -kmer $kmer -complete");
 		system_call ("rm $outname.*.blast.fasta");
 		system_call ("rm -r $outname.Velvet");
@@ -115,15 +120,15 @@ foreach my $region (@regionnames) {
 		print LOG_FH "$region\t$sample\t$contig\t$score\t$percent\n";
 		if ($contig ne "") {
 			# pick this contig from the fasta file
-			my ($taxa, $taxanames) = parse_fasta ("$region.exons.fasta");
+			my ($taxa, $taxanames) = parse_fasta ("$outname.exons.fasta");
 			# write this contig out to the region.fasta file, named by sample.
-			open FH, ">>", "$region.exons.fasta";
+			open FH, ">>", "$outfile.$region.exons.fasta";
 			print "adding $contig to $region.exons.fasta\n";
 			print FH ">$sample\n$taxa->{$contig}\n";
 			close FH;
 			($taxa, $taxanames) = parse_fasta ("$outname.best.fasta");
 			# write this contig out to the region.fasta file, named by sample.
-			open FH, ">>", "$region.full.fasta";
+			open FH, ">>", "$outfile.$region.full.fasta";
 			print "adding $contig from $outname.best.fasta to $region.full.fasta\n";
 			print FH ">$sample\n$taxa->{$contig}\n";
 			close FH;
