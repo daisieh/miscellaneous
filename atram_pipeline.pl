@@ -57,10 +57,11 @@ foreach my $line (<FH>) {
 close FH;
 
 open LOG_FH, ">", "result_log.txt";
-my @regionfiles = ();
 foreach my $region (@regionnames) {
-	push @regionfiles, "$region.fasta";
-	open FH, ">", "$region.fasta";
+	open FH, ">", "$region.exons.fasta";
+	truncate FH, 0;
+	close FH;
+	open FH, ">", "$region.full.fasta";
 	truncate FH, 0;
 	close FH;
 
