@@ -57,6 +57,7 @@ foreach my $line (<FH>) {
 close FH;
 
 open LOG_FH, ">", "result_log.txt";
+	print LOG_FH "region\tsample\tcontig\tbitscore\tpercentcoverage\n";
 foreach my $region (@regionnames) {
 	open FH, ">", "$region.exons.fasta";
 	truncate FH, 0;
