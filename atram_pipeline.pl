@@ -52,6 +52,7 @@ foreach my $line (<FH>) {
 	if ($line =~ /(.+?)\t(.+)/) {
 		$regions->{$1} = $2;
 		push @regionnames, $1;
+		print "pushing $1\n";
 	}
 }
 close FH;
@@ -82,7 +83,7 @@ foreach my $region (@regionnames) {
 		my $score = 0;
 		foreach my $line (<FH>) {
 			if ($line =~ /(\S+)\s+(\S+)$/) {
-				if ($1 =~ /$region/) {
+				if ($1 =~ /reference/) {
 					next;
 				}
 				if ($2 > $score) {
