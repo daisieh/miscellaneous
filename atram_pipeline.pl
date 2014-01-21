@@ -72,11 +72,11 @@ foreach my $region (@regionnames) {
 		system_call ("rm $outname.*.blast.fasta");
 		system_call ("rm -r $outname.Velvet");
 		# run percentcoverage to get the contigs nicely aligned
-		system_call ("perl ~/TRAM/test/PercentCoverage.pl $regions->{$region} $outname.best.fasta $region");
+		system_call ("perl ~/TRAM/test/PercentCoverage.pl $regions->{$region} $outname.best.fasta $outname");
 
 		# find the one best contig (one with fewest gaps)
-		system_call ("blastn -task blastn -query $region.exons.fasta -subject $regions->{$region} -outfmt '6 qseqid bitscore' -out $region.$outname.blast");
-		open FH, "<", "$region.$outname.blast";
+		system_call ("blastn -task blastn -query $region.exons.fasta -subject $regions->{$region} -outfmt '6 qseqid bitscore' -out $outname.blast");
+		open FH, "<", "$outname.blast";
 		my $contig = "";
 		my $score = 0;
 		foreach my $line (<FH>) {
@@ -91,9 +91,26 @@ foreach my $region (@regionnames) {
 			}
 		}
 		close FH;
-		system_call ("rm $region.$outname.blast");
-		$score =~ s/^(\d+\.\d{2}).*$/\1/;
-		print LOG_FH "$region\t$sample\t$contig\t$score\n";
+		system_call ("rm $outname.blast");
+
+		open FH, "<", "$outname.Table.txt";
+		$contig = "";
+		my $percent = 0;
+		foreach my $line (<FH>) {
+			if ($line =~ /(\S+)\t(\S+)\t(\S+)$/) {
+				if ($1 =~ /$region/) {
+					next;
+				}
+				if ($3 > $percent) {
+					$contig = $1;
+					$percent = $3;
+				}
+			}
+		}
+		close FH;
+
+		$percent =~ s/^(\d+\.\d{2}).*$/\1/;
+		print LOG_FH "$region\t$sample\t$contig\t$score\t$percent\n";
 		if ($contig ne "") {
 			# pick this contig from the fasta file
 			my ($taxa, $taxanames) = parse_fasta ("$region.exons.fasta");
