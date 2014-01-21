@@ -52,7 +52,6 @@ foreach my $line (<FH>) {
 	if ($line =~ /(.+?)\t(.+)/) {
 		$regions->{$1} = $2;
 		push @regionnames, $1;
-		print "pushing $1\n";
 	}
 }
 close FH;
@@ -77,7 +76,7 @@ foreach my $region (@regionnames) {
 		system_call ("perl ~/TRAM/test/PercentCoverage.pl $regions->{$region} $outname.best.fasta $outname");
 
 		# find the one best contig (one with fewest gaps)
-		system_call ("blastn -task blastn -query $region.exons.fasta -subject $regions->{$region} -outfmt '6 qseqid bitscore' -out $outname.blast");
+		system_call ("blastn -task blastn -query $outname.exons.fasta -subject $regions->{$region} -outfmt '6 qseqid bitscore' -out $outname.blast");
 		open FH, "<", "$outname.blast";
 		my $contig = "";
 		my $score = 0;
